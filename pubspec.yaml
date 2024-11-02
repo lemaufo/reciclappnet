@@ -69,7 +69,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/fonts/
+    - assets/fonts/Nunito-Regular.ttf
     - assets/reciclapphandsgreen_logo.png
     - assets/barcode_scanner_24dp.png
     - assets/home_30dp.png

@@ -278,19 +278,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, '/scan');
-                    },
-                    child: const Text(
-                      'Scan',
-                      style: TextStyle(
-                        color: Color(0xFF104B28),
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 20)
