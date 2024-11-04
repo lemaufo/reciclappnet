@@ -38,21 +38,39 @@ class _ScanScreenState extends State<ScanScreen> {
   void showResultModal(String result) {
     showModalBottomSheet(
       context: context,
-      isDismissible: true, // Permitir cerrar el modal al tocar afuera
+      isDismissible: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (BuildContext context) {
         return Container(
+          width: double.infinity, // Ocupa todo el ancho de la pantalla
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Resultado del escaneo:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check_circle_outline,
+                      color: Colors.green, size: 30),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Elemento encontrado:',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               Text(
                 result,
-                style: const TextStyle(fontSize: 24),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'En este apartado se presenta la descripción del elemento encontrado.',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -61,16 +79,22 @@ class _ScanScreenState extends State<ScanScreen> {
                   Navigator.pushReplacementNamed(
                       context, '/bag'); // Ir a la ruta '/bag'
                 },
-                child: const Text('Continuar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF104B28),
+                  foregroundColor: Colors.white,
+                  shape: const CircleBorder(), // Forma circular
+                  padding: const EdgeInsets.all(16), // Tamaño del botón
+                ),
+                child: const Icon(Icons.arrow_forward_ios,
+                    size: 24), // Ícono de flecha
               ),
             ],
           ),
         );
       },
     ).whenComplete(() {
-      // Redirigir a '/home' cuando el modal se cierra
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/bag');
     });
   }
 
