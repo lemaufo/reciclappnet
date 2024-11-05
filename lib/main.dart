@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:reciclapp/auth_service.dart'; // Importar AuthService
+import 'package:reciclapp/edit_profile.dart';
 import 'package:reciclapp/email_reset_password_screen.dart';
 import 'package:reciclapp/home_screen_collector.dart';
 import 'package:reciclapp/learn_screen_collector.dart';
@@ -10,6 +11,7 @@ import 'package:reciclapp/privacy_and_terms_screen.dart';
 import 'package:reciclapp/profile_screen_collector.dart';
 // import 'package:reciclapp/requests_collector_screen.dart';
 import 'package:reciclapp/requestscreen.dart';
+import 'package:reciclapp/reset_password_screen.dart';
 import 'splash_screen.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
@@ -18,6 +20,7 @@ import 'learn_screen.dart';
 import 'scan_screen.dart';
 import 'bag_screen.dart';
 import 'profile_screen.dart';
+import 'container_screen.dart';
 
 void main() {
   runApp(const ReciclApp());
@@ -90,7 +93,10 @@ class ReciclApp extends StatelessWidget {
         '/notificationscollector': (context) =>
             const NotificationsCollectorScreen(),
         '/emailresetpassword': (context) => PasswordRecoveryScreen(),
-        '/request': (context) => RequestScreen(),
+        '/request': (context) => const RequestScreen(),
+        '/container': (context) => const ContainerScreen(),
+        '/edit_profile': (context) => const ProfileEditScreen(),
+        '/reset_password': (context) => const ResetPasswordScreen(),
       },
     );
   }

@@ -12,6 +12,16 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor:
             Theme.of(context).scaffoldBackgroundColor, // Fondo transparente
         elevation: 0, // Sin sombra
+        leading: Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            color: const Color(0xFF000000),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/edit_profile');
+            },
+          ),
+        ),
         toolbarHeight: 78.0,
         title: const Text(
           'Perfil',

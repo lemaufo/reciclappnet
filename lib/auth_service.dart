@@ -52,6 +52,8 @@ class AuthService {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('name', name);
           await prefs.setString('photo', photo);
+          await prefs.setString('phone',
+              phone); // PROBAR Si funciona para mostrar en updateProfile()
           await prefs.setInt('rol_id', rolId);
           await prefs.setString('token', data['token'] ?? '');
 
@@ -61,6 +63,8 @@ class AuthService {
             'user': {
               'name': name,
               'photo': photo,
+              'password':
+                  password, // PROBAR Si funciona para mostrar en updateProfile()
               'rol_id': rolId,
             },
           };
@@ -81,6 +85,53 @@ class AuthService {
       return {'error': 'No tienes conexión a Internet.'};
     } catch (e) {
       // Manejar cualquier excepción durante la solicitud
+      return {'error': 'Error en la solicitud: $e'};
+    }
+  }
+
+  // Método para actualizar el perfil del usuario
+  Future<Map<String, dynamic>> updateProfile(
+      String name, String phone, String? password) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('user_id');
+
+      if (userId == null) {
+        return {
+          'error': 'No se ha encontrado el ID de usuario en la sesión actual.'
+        };
+      }
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'action': 'update_profile',
+          'id': userId, // Usar el ID de usuario almacenado
+          'name': name,
+          'phone': phone,
+          'password': password, // Puede ser null si no se cambia
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success'] == true) {
+          return {'success': true, 'message': data['message']};
+        } else {
+          return {'error': data['error'] ?? 'Error al actualizar el perfil.'};
+        }
+      } else {
+        return {
+          'error': 'Error en el servidor. Código: ${response.statusCode}'
+        };
+      }
+    } on SocketException {
+      return {'error': 'No tienes conexión a Internet.'};
+    } catch (e) {
       return {'error': 'Error en la solicitud: $e'};
     }
   }
@@ -106,14 +157,24 @@ class AuthService {
         // Verificar si la API devuelve éxito
         if (data['success'] == true) {
           final user = data['user'] ?? {};
+          final int userId =
+              user['id']; // PRUEBA PARA VER SI ALMACENAR EL ID CORRECTO
           final String name = user['name'] ?? 'Usuario';
           final String photo = user['photo'] ?? '';
+          final String phone = user['phone'] ??
+              ''; //Probar si fucniona para mostrar en updateProfile()
+          final String password = user['password'] ??
+              ''; //Probar si funciona para mostrar en updateProfile()
           final int rolId = user['rol_id'] ?? 1;
 
           // Almacenar los datos del usuario en SharedPreferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('user_id',
+              userId); // PRUEBA PARA VER SI Almacena el ID del usuario
           await prefs.setString('name', name);
           await prefs.setString('photo', photo);
+          await prefs.setString('phone',
+              phone); //Probar si funciona para mostrar en updateProfile()
           await prefs.setInt('rol_id', rolId);
           await prefs.setString('token', data['token']);
 
@@ -123,6 +184,10 @@ class AuthService {
             'user': {
               'name': name,
               'photo': photo,
+              'phone':
+                  phone, //Probar si funciona para mostrar en updateProfile()
+              'password':
+                  password, //Probar si funciona para mostrar en updateProfile()
               'rol_id': rolId,
             },
           };
@@ -193,14 +258,44 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? name = prefs.getString('name');
     final String? photo = prefs.getString('photo');
+    final String? phone = prefs.getString('phone');
     final int? rolId = prefs.getInt('rol_id');
     final String? token = prefs.getString('token');
     return {
       'name': name,
       'photo': photo,
+      'phone': phone, //Probar si funciona para mostrar en updateProfile()
       'rol_id': rolId,
       'token': token,
     };
+  }
+
+  // Método para obtener categorias de materiales
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({"action": "get_material_categories"}),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        List<dynamic> data = responseData['material_categories'];
+        return data
+            .map((item) => {
+                  'name': item['name'],
+                  'description': item[
+                      'description'] // Ajustado para coincidir con la respuesta esperada
+                })
+            .toList();
+      } else {
+        throw Exception('Error en la respuesta de la API');
+      }
+    } else {
+      throw Exception('Error al cargar categorías');
+    }
   }
 
   // Método para cerrar sesión
@@ -208,6 +303,10 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('name');
     await prefs.remove('photo');
+    await prefs
+        .remove('phone'); //Probar si funciona para mostrar en updateProfile()
+    await prefs.remove(
+        'password'); //Probar si funciona para mostrar en updateProfile()
     await prefs.remove('rol_id');
     await prefs.remove('token');
   }

@@ -86,6 +86,16 @@ class _RequestScreenState extends State<RequestScreen> {
           backgroundColor: Theme.of(context)
               .scaffoldBackgroundColor, // Fondo transparente para que combine con la pantalla
           elevation: 0, // Sin sombra
+          leading: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              color: const Color(0xFF000000),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/container');
+              },
+            ),
+          ),
           toolbarHeight: 78.0,
           title: const Text('Solicitar',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0)),
