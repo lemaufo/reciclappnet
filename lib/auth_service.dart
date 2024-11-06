@@ -298,6 +298,50 @@ class AuthService {
     }
   }
 
+  // Método para obtener Solicitudes
+  Future<List<Map<String, dynamic>>> fetchRequests(int userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "action": "get_requests",
+          "user_id": userId,
+        }),
+      );
+
+      // Imprime el cuerpo de la respuesta para depuración
+      // ignore: avoid_print
+      print('Respuesta de la API: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        if (responseData['success'] == true) {
+          List<dynamic> data = responseData['requests'];
+          return data.map((item) {
+            return {
+              'code': item['code'],
+              'status': item['status'],
+              'created_at': item['created_at'],
+              'hour': item['hour'],
+              'scheduled_date': item['scheduled_date'],
+            };
+          }).toList();
+        } else {
+          throw Exception(
+              'Error en la respuesta de la API: ${responseData['message'] ?? 'Sin mensaje de error'}');
+        }
+      } else {
+        throw Exception('Error en la solicitud HTTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Excepción al obtener solicitudes: $e');
+      throw Exception('Error al cargar solicitudes');
+    }
+  }
+
   // Método para cerrar sesión
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
