@@ -17,7 +17,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _obscureTextPassword = true;
+  // bool _obscureTextPassword = true;
   bool _isLoading = true;
 
   @override
@@ -133,6 +133,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                         ),
                         prefixIcon: const Icon(Icons.person_outlined,
                             color: Color(0xFF104B28)),
+                        suffixIcon:
+                            const Icon(Icons.edit, color: Color(0xFF104B28)),
                       ),
                       keyboardType: TextInputType.name,
                       inputFormatters: [LengthLimitingTextInputFormatter(100)],
@@ -170,6 +172,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                         ),
                         prefixIcon: const Icon(Icons.phone_outlined,
                             color: Color(0xFF104B28)),
+                        suffixIcon:
+                            const Icon(Icons.edit, color: Color(0xFF104B28)),
                       ),
                       keyboardType: TextInputType.phone,
                       inputFormatters: [
@@ -196,7 +200,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     ),
                     const SizedBox(height: 20.0),
                     TextFormField(
-                      controller: _passwordController,
+                      // controller: _passwordController,
                       decoration: InputDecoration(
                         hintText: 'Cambiar contraseña',
                         filled: true,
@@ -211,21 +215,10 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                         // ),
                         prefixIcon: const Icon(Icons.lock_outlined,
                             color: Color(0xFF104B28)),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureTextPassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: const Color(0xFF104B28),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureTextPassword = !_obscureTextPassword;
-                            });
-                          },
-                        ),
+                        suffixIcon:
+                            const Icon(Icons.edit, color: Color(0xFF104B28)),
                       ),
-                      obscureText: true,
+                      // obscureText: true,
                       readOnly: true,
                       onTap: () {
                         Navigator.pushReplacementNamed(
