@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Solicitud: ${request['code']}',
+                                        '${request['code']}',
                                         style: const TextStyle(
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.bold,

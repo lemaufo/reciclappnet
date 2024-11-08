@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:reciclapp/auth_service.dart';
+import 'package:reciclapp/bag_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -35,67 +37,207 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  void showResultModal(String result) {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          width: double.infinity, // Ocupa todo el ancho de la pantalla
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle_outline,
-                      color: Colors.green, size: 30),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Elemento encontrado:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                result,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'En este apartado se presenta la descripción del elemento encontrado.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Cerrar el modal
-                  Navigator.pushReplacementNamed(
-                      context, '/bag'); // Ir a la ruta '/bag'
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF104B28),
-                  foregroundColor: Colors.white,
-                  shape: const CircleBorder(), // Forma circular
-                  padding: const EdgeInsets.all(16), // Tamaño del botón
+  void showResultModal(String materialCode) async {
+    try {
+      final result = await AuthService().verifyMaterial(materialCode);
+      int? userId = await AuthService().getCurrentUserId(); // Obtén el userId
+      List<Map<String, dynamic>> searchResults = [];
+      TextEditingController searchController = TextEditingController();
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled:
+            true, // Permite que el modal sea más largo y se ajuste al teclado
+        isDismissible: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              Future<void> searchMaterials(String query) async {
+                if (query.isNotEmpty) {
+                  searchResults = await AuthService().searchMaterials(query);
+                  setState(() {});
+                }
+              }
+
+              return Padding(
+                padding: EdgeInsets.only(
+                  top: 20,
+                  left: 20,
+                  right: 20,
+                  bottom: MediaQuery.of(context).viewInsets.bottom +
+                      20, // Ajuste para que no sea cubierto por el teclado
                 ),
-                child: const Icon(Icons.arrow_forward_ios,
-                    size: 24), // Ícono de flecha
-              ),
-            ],
-          ),
-        );
-      },
-    ).whenComplete(() {
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, '/bag');
-    });
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          result['success']
+                              ? Icons.check_circle_outline
+                              : Icons.error_outline,
+                          color: result['success'] ? Colors.green : Colors.red,
+                          size: 30,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          result['success']
+                              ? 'Elemento encontrado'
+                              : 'Elemento no encontrado',
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      result['message'],
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    if (result['success'] && result['description'] != null)
+                      Text(
+                        result['description'],
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    if (!result['success']) ...[
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          labelText: 'Buscar materiales similares',
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                        onChanged: (value) {
+                          searchMaterials(value);
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      if (searchResults.isNotEmpty)
+                        Column(
+                          children: searchResults.map((material) {
+                            return ListTile(
+                              title: Text(material['name']),
+                              subtitle: Text(material['description']),
+                              onTap: () {
+                                print(
+                                    'Material seleccionado: ${material['name']}');
+                                Navigator.pushReplacementNamed(context, '/bag');
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      if (searchResults.isEmpty &&
+                          searchController.text.isNotEmpty)
+                        Text(
+                          'No se encontraron materiales similares',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                    ],
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        if (result['success']) {
+                          print('userId: $userId');
+                          if (userId != null) {
+                            // Verificamos que los valores críticos no sean null antes de proceder
+                            final image = result['image'];
+                            final description = result['description'];
+                            final categoryId = result['material_category_id'];
+                            if (image != null &&
+                                description != null &&
+                                categoryId != null) {
+                              try {
+                                bool success =
+                                    await AuthService().saveScannedMaterial({
+                                  'material_image': image,
+                                  'material_description': description,
+                                  'quantity': 1,
+                                  'user_id': userId,
+                                  'category_id': categoryId,
+                                });
+
+                                if (success) {
+                                  String categoryName;
+                                  switch (categoryId) {
+                                    case 1:
+                                      categoryName = 'Aluminio';
+                                      break;
+                                    case 2:
+                                      categoryName = 'Vidrio';
+                                      break;
+                                    case 3:
+                                      categoryName = 'Plástico';
+                                      break;
+                                    default:
+                                      categoryName = 'Otra Categoría';
+                                  }
+                                  print('Description: $description');
+                                  print('Image: $image');
+                                  print('Category ID: $categoryId');
+
+                                  // Navegar a CategoryDetailScreen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          CategoryDetailScreen(
+                                        categoryName: categoryName,
+                                        materialDescription: description,
+                                        materialImage: image,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  print(
+                                      'Error: no se pudo guardar el material.');
+                                }
+                              } catch (e) {
+                                print(
+                                    'Error al guardar el material escaneado Modal: $e');
+                              }
+                            } else {
+                              print(
+                                  'Error: Uno o más valores de material escaneado son nulos. No se puede proceder.');
+                            }
+                          } else {
+                            print(
+                                'Error: userId es nulo. No se puede guardar el material escaneado.');
+                          }
+                        } else {
+                          Navigator.pushReplacementNamed(context, '/scan');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF104B28),
+                        foregroundColor: Colors.white,
+                        shape: CircleBorder(),
+                        padding: const EdgeInsets.all(16),
+                      ),
+                      child: Icon(
+                        result['success']
+                            ? Icons.arrow_forward_ios
+                            : Icons.refresh,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+    } catch (e) {
+      print('Error al verificar el material: $e');
+    }
   }
 
   @override

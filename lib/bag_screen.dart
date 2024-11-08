@@ -30,6 +30,7 @@ class _BagScreenState extends State<BagScreen> {
       // Manejar errores
       // ignore: avoid_print
       print('Error al cargar categorías: $error');
+      print('Categorías cargadas: $categories');
     }
   }
 
@@ -59,18 +60,23 @@ class _BagScreenState extends State<BagScreen> {
                   padding: const EdgeInsets.only(
                       bottom: 50.0), // Espacio entre elementos
                   child: ListTile(
-                    leading: Image.network(
-                      category['image_url'] ?? '',
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.image,
-                        size: 100,
-                      ), // Ícono alternativo si la imagen falla al cargar
-                    ),
+                    leading: (category['image'] != null)
+                        ? Image.network(
+                            'https://reciclapp.net${category['image']}',
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.image,
+                              size: 100,
+                            ),
+                          )
+                        : Icon(
+                            Icons.image,
+                            size: 100,
+                          ),
                     title: Text(
-                      'Bolsa de ${category['name']}', // Nombre de la categoría
+                      'Bolsa de ${category['name'] ?? 'Sin nombre'}', // Nombre de la categoría
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -82,7 +88,9 @@ class _BagScreenState extends State<BagScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => CategoryDetailScreen(
-                            categoryName: category['name'],
+                            categoryName: category['name'] ?? 'Sin nombre',
+                            materialDescription: '',
+                            materialImage: '',
                           ),
                         ),
                       );
@@ -140,10 +148,110 @@ class _BagScreenState extends State<BagScreen> {
   }
 }
 
-class CategoryDetailScreen extends StatelessWidget {
-  final String categoryName;
+// class CategoryDetailScreen extends StatelessWidget {
+//   final String categoryName;
+//   final String materialDescription;
+//   final String materialImage;
 
-  const CategoryDetailScreen({super.key, required this.categoryName});
+//   const CategoryDetailScreen({
+//     super.key,
+//     required this.categoryName,
+//     required this.materialDescription,
+//     required this.materialImage,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+//         elevation: 0,
+//         leading: Padding(
+//           padding: const EdgeInsets.only(top: 2),
+//           child: IconButton(
+//             icon: const Icon(Icons.arrow_back_ios),
+//             color: const Color(0xFF000000),
+//             onPressed: () {
+//               Navigator.pushReplacementNamed(context, '/bag');
+//             },
+//           ),
+//         ),
+//         toolbarHeight: 78.0,
+//         title: Text(
+//           'Detalles',
+//           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
+//         ),
+//         automaticallyImplyLeading: false,
+//         centerTitle: true,
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Image.network(
+//               'https://reciclapp.net/$materialImage',
+//               width: 100,
+//               height: 100,
+//               fit: BoxFit.cover,
+//               errorBuilder: (context, error, stackTrace) => Icon(
+//                 Icons.image,
+//                 size: 100,
+//               ),
+//             ), // Imagen del material
+//             const SizedBox(height: 20),
+//             Text(
+//               materialDescription,
+//               style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+//             ),
+//             const SizedBox(height: 20),
+//             Text(
+//               'Bolsa de $categoryName',
+//               style: const TextStyle(fontSize: 20),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+class CategoryDetailScreen extends StatefulWidget {
+  final String categoryName;
+  final String materialDescription;
+  final String materialImage;
+
+  const CategoryDetailScreen({
+    super.key,
+    required this.categoryName,
+    required this.materialDescription,
+    required this.materialImage,
+  });
+
+  @override
+  _CategoryDetailScreenState createState() => _CategoryDetailScreenState();
+}
+
+class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
+  List<Map<String, dynamic>> scannedMaterials = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchScannedMaterials();
+  }
+
+  Future<void> fetchScannedMaterials() async {
+    int? userId = await AuthService().getCurrentUserId();
+
+    if (userId != null) {
+      scannedMaterials = await AuthService().getScannedMaterials(userId);
+      setState(() {});
+    } else {
+      print(
+          'Error: El userId es nulo. No se puede obtener los materiales escaneados.');
+      // Muestra un mensaje de error o redirige al usuario para iniciar sesión de nuevo.
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,28 +259,47 @@ class CategoryDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            color: const Color(0xFF000000),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/bag');
-            },
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          color: const Color(0xFF000000),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/bag');
+          },
         ),
-        toolbarHeight: 78.0,
-        title: Text(categoryName,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0)),
-        automaticallyImplyLeading: false,
+        title: Text(
+          'Detalles de ${widget.categoryName}',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
+        ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Text(
-          'Contenido para la categoría: $categoryName',
-          style: const TextStyle(fontSize: 20),
-        ),
-      ),
+      body: scannedMaterials.isEmpty
+          ? Center(child: Text('No hay materiales escaneados disponibles.'))
+          : ListView.builder(
+              itemCount: scannedMaterials.length,
+              itemBuilder: (context, index) {
+                final material = scannedMaterials[index];
+
+                // Manejamos valores potencialmente nulos con valores por defecto
+                final imageUrl = material['material_image'] != null
+                    ? 'https://reciclapp.net/${material['material_image']}'
+                    : 'https://reciclapp.net/default_image.png'; // Imagen por defecto
+
+                final description =
+                    material['material_description'] ?? 'Sin descripción';
+                final quantity = material['quantity'] ?? 0;
+
+                return ListTile(
+                  leading: Image.network(
+                    imageUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  title: Text(description),
+                  trailing: Text('Cantidad: $quantity'),
+                );
+              },
+            ),
     );
   }
 }

@@ -270,6 +270,13 @@ class AuthService {
     };
   }
 
+  // Método para obtener el ID del usuario guardado en SharedPreferences
+  Future<int?> getCurrentUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(
+        'user_id'); // Asegúrate de que 'user_id' esté guardado en SharedPreferences al iniciar sesión
+  }
+
   // Método para obtener categorias de materiales
   Future<List<Map<String, dynamic>>> fetchCategories() async {
     final response = await http.post(
@@ -287,7 +294,8 @@ class AuthService {
             .map((item) => {
                   'name': item['name'],
                   'description': item[
-                      'description'] // Ajustado para coincidir con la respuesta esperada
+                      'description'], // Ajustado para coincidir con la respuesta esperada
+                  'image': item['image'],
                 })
             .toList();
       } else {
@@ -295,6 +303,94 @@ class AuthService {
       }
     } else {
       throw Exception('Error al cargar categorías');
+    }
+  }
+
+  // Método para verificar material
+  Future<Map<String, dynamic>> verifyMaterial(String materialCode) async {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'action': 'verify_material',
+        'material_code': materialCode,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al verificar el material');
+    }
+  }
+
+  // Método para buscar materiales similares
+  Future<List<Map<String, dynamic>>> searchMaterials(String searchTerm) async {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'action': 'search_materials',
+        'search_term': searchTerm,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data['materials']);
+    } else {
+      throw Exception('Error al buscar materiales similares');
+    }
+  }
+
+  // Método para guardar material escaneado
+  Future<bool> saveScannedMaterial(Map<String, dynamic> materialData) async {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: json.encode({
+        "action": "save_scanned_material",
+        ...materialData,
+      }),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        return true; // Retornar true en caso de éxito
+      } else {
+        print('Error en la respuesta de la API: ${data['error']}');
+        return false;
+      }
+    } else {
+      print('Error HTTP: ${response.statusCode}');
+      throw Exception('Error al guardar el material escaneado Auth');
+    }
+  }
+
+  // Método para mostrar los materiales escaneados del usuario
+  Future<List<Map<String, dynamic>>> getScannedMaterials(int userId) async {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: json.encode({
+        "action": "get_scanned_materials",
+        "user_id": userId,
+      }),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        return List<Map<String, dynamic>>.from(data['scanned_materials']);
+      } else {
+        throw Exception('No se encontraron materiales escaneados');
+      }
+    } else {
+      throw Exception('Error al obtener materiales escaneados');
     }
   }
 
