@@ -85,7 +85,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           padding: const EdgeInsets.only(top: 2),
           child: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
-            color: const Color(0xFF000000),
+            // color: const Color(0xFF000000),
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/profile');
             },

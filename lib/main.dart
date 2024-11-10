@@ -51,6 +51,37 @@ class ReciclApp extends StatelessWidget {
         fontFamily: 'Nunito',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
+      // themeMode: ThemeMode.system, // Detecta el tema del sistema
+      // theme: ThemeData(
+      //   // Tema claro
+      //   brightness: Brightness.light,
+      //   primaryColor: Colors.green,
+      //   scaffoldBackgroundColor: Colors.white,
+      //   appBarTheme: const AppBarTheme(
+      //     backgroundColor: Colors.white,
+      //     titleTextStyle: TextStyle(
+      //         color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+      //     iconTheme: IconThemeData(color: Colors.black),
+      //   ),
+      //   textTheme: const TextTheme(
+      //       // bodyText1: TextStyle(color: Colors.black),
+      //       ),
+      // ),
+      // darkTheme: ThemeData(
+      //   // Tema oscuro
+      //   brightness: Brightness.dark,
+      //   primaryColor: Colors.green,
+      //   scaffoldBackgroundColor: Colors.black,
+      //   appBarTheme: const AppBarTheme(
+      //     backgroundColor: Colors.black,
+      //     titleTextStyle: TextStyle(
+      //         color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+      //     iconTheme: IconThemeData(color: Colors.white),
+      //   ),
+      //   textTheme: const TextTheme(
+      //       // bodyText1: TextStyle(color: Colors.white),
+      //       ),
+      // ),
       home: FutureBuilder<String>(
         future:
             _determineInitialScreen(), // Espera la ruta de la pantalla inicial

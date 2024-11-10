@@ -19,10 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   String errorMessage = ''; // Mensaje de error
 
   final List<String> _imagePaths = [
-    'assets/profile.png',
-    'assets/reciclapp_logo.png',
-    'assets/reciclapphands_logo.png',
-    'assets/reciclapphandsgreen_logo.png',
+    'assets/plastic.png',
+    'assets/glass.png',
+    'assets/aluminum.png',
+    'assets/cardboard.png',
   ];
 
   @override
