@@ -66,68 +66,7 @@ class _LearnScreenState extends State<LearnScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Sugerencias de búsqueda
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Wrap(
-              spacing: 8.0,
-              children: suggestions.map((suggestion) {
-                return ActionChip(
-                  label: Text(suggestion),
-                  onPressed: () {
-                    _controller.text = suggestion;
-                    _getResponse(suggestion);
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-          // Campo de entrada de texto y botón de búsqueda
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: 'Escribe tu pregunta sobre reciclaje...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      _getResponse(_controller.text);
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          // Respuesta de ChatGPT
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SingleChildScrollView(
-                      child: Text(
-                        _response,
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      ),
+      body: const SizedBox(),
       bottomNavigationBar: const CustomBottomNavBar(currentIndex: 1),
     );
   }
