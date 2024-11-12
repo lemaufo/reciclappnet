@@ -134,7 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     size: 30,
                   ),
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/notifications');
+                    Navigator.pushReplacementNamed(
+                        context, '/emailresetpassword');
                   },
                 ),
               ),

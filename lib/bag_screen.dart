@@ -63,8 +63,8 @@ class _BagScreenState extends State<BagScreen> {
                     leading: (category['image'] != null)
                         ? Image.network(
                             'https://reciclapp.net${category['image']}',
-                            width: 90,
-                            height: 90,
+                            width: 70,
+                            // height: 100,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) => Icon(
                               Icons.image,

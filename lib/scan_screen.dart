@@ -25,7 +25,7 @@ class _ScanScreenState extends State<ScanScreen> {
       final result = await BarcodeScanner.scan();
 
       if (result.rawContent.isNotEmpty) {
-        showResultModal(result.rawContent);
+        showResultModal(context, result.rawContent);
       } else {
         // Si el usuario cancela, redirige a la pantalla '/home'
         // ignore: use_build_context_synchronously
@@ -33,11 +33,11 @@ class _ScanScreenState extends State<ScanScreen> {
       }
     } catch (e) {
       // En caso de error, muestra el modal con el error y redirige a '/home' al cerrarlo
-      showResultModal('Error: $e');
+      showResultModal(context, 'Error: $e');
     }
   }
 
-  void showResultModal(String materialCode) async {
+  void showResultModal(BuildContext mainContext, String materialCode) async {
     try {
       final result = await AuthService().verifyMaterial(materialCode);
       int? userId = await AuthService().getCurrentUserId(); // Obtén el userId
@@ -45,9 +45,8 @@ class _ScanScreenState extends State<ScanScreen> {
       TextEditingController searchController = TextEditingController();
 
       showModalBottomSheet(
-        context: context,
-        isScrollControlled:
-            true, // Permite que el modal sea más largo y se ajuste al teclado
+        context: mainContext,
+        isScrollControlled: true,
         isDismissible: true,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -67,8 +66,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   top: 20,
                   left: 20,
                   right: 20,
-                  bottom: MediaQuery.of(context).viewInsets.bottom +
-                      20, // Ajuste para que no sea cubierto por el teclado
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -123,14 +121,67 @@ class _ScanScreenState extends State<ScanScreen> {
                         Column(
                           children: searchResults.map((material) {
                             return ListTile(
-                              title: Text(material['name']),
-                              subtitle: Text(material['description']),
-                              onTap: () {
-                                print(
-                                    'Material seleccionado: ${material['name']}');
-                                Navigator.pushReplacementNamed(context, '/bag');
-                              },
-                            );
+                                title: Text(material['name']),
+                                subtitle: Text(material['description']),
+                                onTap: () async {
+                                  print(
+                                      'Material seleccionado: ${material['name']}');
+
+                                  // Imprimir cada valor para depurar cuáles son null
+                                  print('image: ${material['image']}');
+                                  print(
+                                      'material_description: ${material['description']}');
+                                  print(
+                                      'category_id: ${material['material_category_id']}');
+                                  print('user_id: $userId');
+
+                                  // Información del material
+                                  final selectedMaterialData = {
+                                    'image': material['image'],
+                                    'material_description':
+                                        material['description'],
+                                    'quantity': 1,
+                                    'user_id': userId,
+                                    'category_id':
+                                        material['material_category_id'],
+                                  };
+
+                                  // Verificar que todos los valores críticos no sean null antes de intentar guardar
+                                  if (material['image'] != null &&
+                                      material['description'] != null &&
+                                      material['material_category_id'] !=
+                                          null &&
+                                      userId != null) {
+                                    try {
+                                      // Intento de guardar el material
+                                      bool success = await AuthService()
+                                          .saveScannedMaterial(
+                                              selectedMaterialData);
+
+                                      if (success) {
+                                        // Si se guarda correctamente, redirige a "Bag"
+                                        try {
+                                          Navigator.pushReplacementNamed(
+                                              mainContext, '/bag');
+                                          print(
+                                              'Material guardado correctamente y redirigido a "Bag".');
+                                        } catch (e) {
+                                          print(
+                                              'Error de navegación a bolsa: $e');
+                                        }
+                                      } else {
+                                        print(
+                                            'Error: No se pudo guardar el material seleccionado.');
+                                      }
+                                    } catch (e) {
+                                      print(
+                                          'Error al guardar el material seleccionado: $e');
+                                    }
+                                  } else {
+                                    print(
+                                        'Error: Uno o más valores de material escaneado son nulos. No se puede proceder.');
+                                  }
+                                });
                           }).toList(),
                         ),
                       if (searchResults.isEmpty &&
@@ -145,7 +196,7 @@ class _ScanScreenState extends State<ScanScreen> {
                       onPressed: () async {
                         Navigator.pop(context);
                         if (result['success']) {
-                          print('userId: $userId');
+                          // print('userId: $userId');
                           if (userId != null) {
                             // Verificamos que los valores críticos no sean null antes de proceder
                             final image = result['image'];
@@ -165,36 +216,12 @@ class _ScanScreenState extends State<ScanScreen> {
                                 });
 
                                 if (success) {
-                                  String categoryName;
-                                  switch (categoryId) {
-                                    case 1:
-                                      categoryName = 'Aluminio';
-                                      break;
-                                    case 2:
-                                      categoryName = 'Vidrio';
-                                      break;
-                                    case 3:
-                                      categoryName = 'Plástico';
-                                      break;
-                                    default:
-                                      categoryName = 'Otra Categoría';
+                                  try {
+                                    Navigator.pushReplacementNamed(
+                                        mainContext, '/bag');
+                                  } catch (e) {
+                                    print('Error de navegación a bolsa: $e');
                                   }
-                                  print('Description: $description');
-                                  print('Image: $image');
-                                  print('Category ID: $categoryId');
-
-                                  // Navegar a CategoryDetailScreen
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          CategoryDetailScreen(
-                                        categoryName: categoryName,
-                                        materialDescription: description,
-                                        materialImage: image,
-                                      ),
-                                    ),
-                                  );
                                 } else {
                                   print(
                                       'Error: no se pudo guardar el material.');
