@@ -61,7 +61,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
         automaticallyImplyLeading: false,
         title: const SizedBox.shrink(),
       ),
-      body: Container(),
+      body: SizedBox(),
     );
   }
 }
