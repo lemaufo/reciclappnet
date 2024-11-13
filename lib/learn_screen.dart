@@ -16,7 +16,7 @@ class _LearnScreenState extends State<LearnScreen> {
   bool _isLoading = false;
   List<String> suggestions = [
     '¿Cómo reciclar plástico?',
-    'Beneficios del reciclaje',
+    'Beneficios de reciclar',
     'Reciclaje en casa',
     'Materiales reciclables',
   ];
@@ -94,7 +94,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   child: TextField(
                     controller: _controller,
                     decoration: InputDecoration(
-                      hintText: 'Escribe tu pregunta sobre reciclaje...',
+                      hintText: 'Escribe una pregunta sobre reciclaje',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
@@ -102,7 +102,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.search),
                   onPressed: () {
                     if (_controller.text.isNotEmpty) {
                       _getResponse(_controller.text);
