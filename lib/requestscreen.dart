@@ -399,37 +399,37 @@ class _RequestScreenState extends State<RequestScreen> {
                   ),
                 ),
                 const SizedBox(height: 13.0),
-                TextField(
-                  readOnly: true, // Campo de solo lectura
-                  onTap: getLocation,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.transparent,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(
-                        color: Colors.transparent,
-                        width: 0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(
-                        color: Colors
-                            .transparent, // Color del borde cuando está enfocado
-                        width: 0,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.location_pin,
-                        color: Color(0xFF104B28)), // Ícono a la izquierda
-                    // ignore: unnecessary_null_comparison
-                    hintText:
-                        "Usar mi ubicación actual", // Texto por defecto si no hay fecha seleccionada
-                    // hintStyle: const TextStyle(color: Colors.black),
-                  ),
-                ),
+                // TextField(
+                //   readOnly: true, // Campo de solo lectura
+                //   onTap: getLocation,
+                //   decoration: InputDecoration(
+                //     filled: true,
+                //     fillColor: Colors.transparent,
+                //     contentPadding: const EdgeInsets.symmetric(
+                //         horizontal: 20, vertical: 10),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(15),
+                //       borderSide: const BorderSide(
+                //         color: Colors.transparent,
+                //         width: 0,
+                //       ),
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(15),
+                //       borderSide: const BorderSide(
+                //         color: Colors
+                //             .transparent, // Color del borde cuando está enfocado
+                //         width: 0,
+                //       ),
+                //     ),
+                //     prefixIcon: const Icon(Icons.location_pin,
+                //         color: Color(0xFF104B28)), // Ícono a la izquierda
+                //     // ignore: unnecessary_null_comparison
+                //     hintText:
+                //         "Usar mi ubicación actual", // Texto por defecto si no hay fecha seleccionada
+                //     // hintStyle: const TextStyle(color: Colors.black),
+                //   ),
+                // ),
                 const SizedBox(height: 13.0),
                 SizedBox(
                   width: 350,
@@ -448,7 +448,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           SnackBar(
                             content: Text(
                                 'Por favor, selecciona una ubicación antes de enviar.'),
-                            backgroundColor: Colors.red,
+                            // backgroundColor: Colors.red,
                           ),
                         );
                       }

@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:reciclapp/auth_service.dart'; // Importar AuthService
 import 'package:reciclapp/edit_profile.dart';
+import 'package:reciclapp/edit_profile_collector.dart';
 import 'package:reciclapp/email_reset_password_screen.dart';
+import 'package:reciclapp/help_collector_screen.dart';
 import 'package:reciclapp/help_screen.dart';
 import 'package:reciclapp/home_screen_collector.dart';
 import 'package:reciclapp/learn_screen_collector.dart';
 import 'package:reciclapp/notifications_collector_screen.dart';
 import 'package:reciclapp/notifications_screen.dart';
+import 'package:reciclapp/privacy_terms_collector_screen.dart';
 import 'package:reciclapp/privacy_terms_screen.dart';
 import 'package:reciclapp/privacy_and_terms_screen.dart';
 import 'package:reciclapp/profile_screen_collector.dart';
@@ -123,6 +126,8 @@ class ReciclApp extends StatelessWidget {
         '/profilecollector': (context) => const ProfileCollectorScreen(),
         '/privacyandterms': (context) => const PrivacyAndTermsScreen(),
         '/profileprivacyandterms': (context) => const PrivacyTermsScreen(),
+        '/profileprivacyandtermscollector': (context) =>
+            const PrivacyTermsCollectorScreen(),
         '/notifications': (context) => const NotificationsScreen(),
         '/notificationscollector': (context) =>
             const NotificationsCollectorScreen(),
@@ -132,8 +137,11 @@ class ReciclApp extends StatelessWidget {
               materials: [],
             ),
         '/edit_profile': (context) => const ProfileEditScreen(),
+        '/edit_profile_collector': (context) =>
+            const ProfileEditCollectorScreen(),
         '/reset_password': (context) => const ResetPasswordScreen(),
         '/help': (context) => const HelpScreen(),
+        '/helpcollector': (context) => const HelpCollectorScreen(),
       },
     );
   }
