@@ -394,6 +394,95 @@ class AuthService {
     }
   }
 
+  // Método para enviar solicitud de recolección
+  Future<Map<String, dynamic>> createRequest(int userId, double latitude,
+      double longitude, String scheduledDate, String hour) async {
+    try {
+      // Enviar solicitud POST
+      final response = await http.post(
+        Uri.parse('$apiUrl/create_request'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'action': 'create_request',
+          'user_id': userId,
+          'latitude': latitude,
+          'longitude': longitude,
+          'scheduled_date': scheduledDate,
+          'hour': hour,
+        }),
+      );
+
+      // Log para depurar
+      print('Request: ${json.encode({
+            'action': 'create_request',
+            'user_id': userId,
+            'latitude': latitude,
+            'longitude': longitude,
+            'scheduled_date': scheduledDate,
+            'hour': hour,
+          })}');
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      print('Petición: ${json.encode({
+            'action': 'create_request',
+            'user_id': userId,
+            'latitude': latitude,
+            'longitude': longitude,
+            'scheduled_date': scheduledDate,
+            'hour': hour,
+          })}');
+
+      print('Headers: ${{
+        'Content-Type': 'application/json',
+      }}');
+
+      // Verificar si el cuerpo de la respuesta está vacío
+      if (response.body.isEmpty) {
+        print('Error: Respuesta del servidor vacía.');
+        return {
+          'success': false,
+          'error': 'Respuesta del servidor vacía.',
+        };
+      }
+
+      // Decodificar la respuesta JSON
+      final data = json.decode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // Verificar si la respuesta indica éxito
+        if (data['success'] == true) {
+          return {
+            'success': true,
+            'message': data['message'] ?? 'Solicitud creada exitosamente.',
+            'request_code': data['request_code'] ?? '',
+          };
+        } else {
+          return {
+            'success': false,
+            'error': data['message'] ?? 'Error al crear la solicitud.',
+          };
+        }
+      } else {
+        // Manejar otros códigos de error
+        return {
+          'success': false,
+          'error': data['message'] ??
+              'Error en el servidor. Código: ${response.statusCode}',
+        };
+      }
+    } on SocketException {
+      // Error de conexión
+      return {'success': false, 'error': 'No tienes conexión a Internet.'};
+    } catch (e) {
+      // Otros errores
+      print('Error en la solicitud: $e');
+      return {'success': false, 'error': 'Error en la solicitud: $e'};
+    }
+  }
+
   // Método para obtener Solicitudes
   Future<List<Map<String, dynamic>>> fetchRequests(int userId) async {
     try {
@@ -419,7 +508,7 @@ class AuthService {
             return {
               'code': item['code'],
               'status': item['status'],
-              'created_at': item['created_at'],
+              'date': item['date'],
               'hour': item['hour'],
               'scheduled_date': item['scheduled_date'],
             };

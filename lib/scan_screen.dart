@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:reciclapp/auth_service.dart';
-import 'package:reciclapp/bag_screen.dart';
+// import 'package:reciclapp/bag_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -124,20 +124,20 @@ class _ScanScreenState extends State<ScanScreen> {
                                 title: Text(material['name']),
                                 subtitle: Text(material['description']),
                                 onTap: () async {
-                                  print(
-                                      'Material seleccionado: ${material['name']}');
+                                  // print(
+                                  //     'Material seleccionado: ${material['name']}');
 
-                                  // Imprimir cada valor para depurar cuáles son null
-                                  print('image: ${material['image']}');
-                                  print(
-                                      'material_description: ${material['description']}');
-                                  print(
-                                      'category_id: ${material['material_category_id']}');
-                                  print('user_id: $userId');
+                                  // // Imprimir cada valor para depurar cuáles son null
+                                  // print('image: ${material['image']}');
+                                  // print(
+                                  //     'material_description: ${material['description']}');
+                                  // print(
+                                  //     'category_id: ${material['material_category_id']}');
+                                  // print('user_id: $userId');
 
                                   // Información del material
                                   final selectedMaterialData = {
-                                    'image': material['image'],
+                                    'material_image': material['image'],
                                     'material_description':
                                         material['description'],
                                     'quantity': 1,

@@ -128,7 +128,9 @@ class ReciclApp extends StatelessWidget {
             const NotificationsCollectorScreen(),
         '/emailresetpassword': (context) => PasswordRecoveryScreen(),
         '/request': (context) => const RequestScreen(),
-        '/container': (context) => const ContainerScreen(),
+        '/container': (context) => const ContainerScreen(
+              materials: [],
+            ),
         '/edit_profile': (context) => const ProfileEditScreen(),
         '/reset_password': (context) => const ResetPasswordScreen(),
         '/help': (context) => const HelpScreen(),

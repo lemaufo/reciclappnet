@@ -246,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(height: 4),
                                       Text('Estatus: ${request['status']}'),
                                       Text(
-                                          'Fecha de solicitud: ${request['created_at']}'),
+                                          'Fecha de solicitud: ${request['date']}'),
                                       Text('Hora: ${request['hour']}'),
                                       Text(
                                           'Fecha de recolección: ${request['scheduled_date']}'),

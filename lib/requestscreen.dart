@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:reciclapp/auth_service.dart';
 import 'package:reciclapp/custom_bottom_nav_bar.dart';
 import 'package:reciclapp/map_screen.dart';
 import 'package:geolocator/geolocator.dart';
@@ -17,6 +18,11 @@ class RequestScreen extends StatefulWidget {
 
 class _RequestScreenState extends State<RequestScreen> {
   String locationName = "Buscar ubicaciones";
+  double? latitude;
+  double? longitude;
+
+  DateTime selectedDate = DateTime.now();
+  TextEditingController timePicker = TextEditingController();
 
   // Función para abrir el mapa y seleccionar una ubicación
   Future<void> _openMap() async {
@@ -29,11 +35,14 @@ class _RequestScreenState extends State<RequestScreen> {
 
     if (selectedLocation != null) {
       setState(() {
-        locationName = selectedLocation; // Actualiza el nombre en el TextField
+        locationName = selectedLocation['locationName'];
+        latitude = selectedLocation['latitude'];
+        longitude = selectedLocation['longitude'];
       });
     }
   }
 
+// Función para obtener la ubicación actual
   void getLocation() async {
     await Geolocator.checkPermission();
     await Geolocator.requestPermission();
@@ -51,10 +60,6 @@ class _RequestScreenState extends State<RequestScreen> {
       locationName = "Usando mi ubicación actual";
     });
   }
-
-  DateTime selectedDate = DateTime.now();
-
-  TextEditingController timePicker = TextEditingController();
 
   // Generar la lista de horarios de cada media hora entre 6:00 AM y 6:00 PM
   List<String> _generateHalfHourIntervals() {
@@ -77,6 +82,86 @@ class _RequestScreenState extends State<RequestScreen> {
     }
 
     return times;
+  }
+
+  // Función para enviar los datos a la API
+  Future<void> _sendRequest(Map<String, double> selectedLocation) async {
+    // Asegúrate de que locationName y timePicker.text sean válidos
+    if (locationName == "Buscar ubicaciones" || timePicker.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Por favor, completa todos los campos."),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Obtener el userId
+      int? userId = await AuthService().getCurrentUserId();
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Usuario no identificado. Por favor, inicia sesión."),
+          ),
+        );
+        return;
+      }
+
+      // Formatear la fecha seleccionada a ISO 8601
+      String formattedDate =
+          selectedDate.toIso8601String().split('T')[0]; // Fecha completa
+      String formattedHour =
+          timePicker.text; // Hora ya seleccionada por el usuario
+
+      print('Datos enviados:');
+      print({
+        'action': 'create_request',
+        'user_id': userId,
+        'latitude': latitude,
+        'longitude': longitude,
+        'scheduled_date': formattedDate,
+        'hour': formattedHour,
+      });
+      print('Datos validados en _sendRequest:');
+      print('userId: $userId');
+      print('latitude: ${selectedLocation['latitude']}');
+      print('longitude: ${selectedLocation['longitude']}');
+      print('scheduledDate: $formattedDate');
+      print('hour: $formattedHour');
+
+      // Llamar al método createRequest con las coordenadas y datos adicionales
+      final response = await AuthService().createRequest(
+        userId,
+        selectedLocation['latitude']!,
+        selectedLocation['longitude']!,
+        formattedDate, // Enviar fecha en formato ISO
+        formattedHour,
+      );
+
+      if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+          ),
+        );
+        // Navigator.pop(context); // Regresar o limpiar la vista
+        Navigator.pushReplacementNamed(
+            context, '/home'); // Ir a la pantalla principal
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['error']),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+        ),
+      );
+    }
   }
 
   @override
@@ -350,7 +435,24 @@ class _RequestScreenState extends State<RequestScreen> {
                   width: 350,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if (latitude != null && longitude != null) {
+                        final selectedLocation = {
+                          'latitude': latitude!, // Forzar a no nulo
+                          'longitude': longitude!, // Forzar a no nulo
+                        };
+                        _sendRequest(
+                            selectedLocation); // Llamar con valores no nulos
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Por favor, selecciona una ubicación antes de enviar.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF104B28),
                       foregroundColor: Colors.white,

@@ -42,13 +42,18 @@ class _MapScreenState extends State<MapScreen> {
     print(
         'Ubicación seleccionada: Latitud ${selectedLocation.latitude}, Longitud ${selectedLocation.longitude}');
 
-    if (placemarks.isNotEmpty) {
-      // ignore: use_build_context_synchronously
-      Navigator.pop(context, placemarks.first.locality);
-    } else {
-      // ignore: use_build_context_synchronously
-      Navigator.pop(context, "Ubicación desconocida");
-    }
+    // Crea el resultado con nombre y coordenadas
+    final result = {
+      'locationName': placemarks.isNotEmpty
+          ? placemarks.first.locality
+          : "Ubicación desconocida",
+      'latitude': selectedLocation.latitude,
+      'longitude': selectedLocation.longitude,
+    };
+
+    // Retorna los datos al cerrar la pantalla
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context, result);
   }
 
   @override

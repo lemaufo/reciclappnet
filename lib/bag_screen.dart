@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reciclapp/container_screen.dart';
 import 'package:reciclapp/custom_bottom_nav_bar.dart';
 import 'package:reciclapp/auth_service.dart'; // Importa auth_service.dart para manejar la API
 
@@ -148,73 +149,6 @@ class _BagScreenState extends State<BagScreen> {
   }
 }
 
-// class CategoryDetailScreen extends StatelessWidget {
-//   final String categoryName;
-//   final String materialDescription;
-//   final String materialImage;
-
-//   const CategoryDetailScreen({
-//     super.key,
-//     required this.categoryName,
-//     required this.materialDescription,
-//     required this.materialImage,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-//         elevation: 0,
-//         leading: Padding(
-//           padding: const EdgeInsets.only(top: 2),
-//           child: IconButton(
-//             icon: const Icon(Icons.arrow_back_ios),
-//             color: const Color(0xFF000000),
-//             onPressed: () {
-//               Navigator.pushReplacementNamed(context, '/bag');
-//             },
-//           ),
-//         ),
-//         toolbarHeight: 78.0,
-//         title: Text(
-//           'Detalles',
-//           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.0),
-//         ),
-//         automaticallyImplyLeading: false,
-//         centerTitle: true,
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Image.network(
-//               'https://reciclapp.net/$materialImage',
-//               width: 100,
-//               height: 100,
-//               fit: BoxFit.cover,
-//               errorBuilder: (context, error, stackTrace) => Icon(
-//                 Icons.image,
-//                 size: 100,
-//               ),
-//             ), // Imagen del material
-//             const SizedBox(height: 20),
-//             Text(
-//               materialDescription,
-//               style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-//             ),
-//             const SizedBox(height: 20),
-//             Text(
-//               'Bolsa de $categoryName',
-//               style: const TextStyle(fontSize: 20),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class CategoryDetailScreen extends StatefulWidget {
   final String categoryName;
   final String materialDescription;
@@ -274,31 +208,68 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       ),
       body: scannedMaterials.isEmpty
           ? Center(child: Text('No hay materiales escaneados disponibles.'))
-          : ListView.builder(
-              itemCount: scannedMaterials.length,
-              itemBuilder: (context, index) {
-                final material = scannedMaterials[index];
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: scannedMaterials.length,
+                    itemBuilder: (context, index) {
+                      final material = scannedMaterials[index];
 
-                // Manejamos valores potencialmente nulos con valores por defecto
-                final imageUrl = material['material_image'] != null
-                    ? 'https://reciclapp.net/${material['material_image']}'
-                    : 'https://reciclapp.net/default_image.png'; // Imagen por defecto
+                      // Manejamos valores potencialmente nulos con valores por defecto
+                      final imageUrl = material['material_image'] != null
+                          ? 'https://reciclapp.net/${material['material_image']}'
+                          : 'https://reciclapp.net/default/profile.png'; // Imagen por defecto
 
-                final description =
-                    material['material_description'] ?? 'Sin descripción';
-                final quantity = material['quantity'] ?? 0;
+                      final description =
+                          material['material_description'] ?? 'Sin descripción';
+                      final quantity = material['quantity'] ?? 0;
 
-                return ListTile(
-                  leading: Image.network(
-                    imageUrl,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
+                      return ListTile(
+                        leading: Image.network(
+                          imageUrl,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                        title: Text(description),
+                        trailing: Text('Cantidad: $quantity'),
+                      );
+                    },
                   ),
-                  title: Text(description),
-                  trailing: Text('Cantidad: $quantity'),
-                );
-              },
+                ),
+                // Botón agregado al final
+                Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navegar a la vista Contenedor pasando los materiales
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ContainerScreen(
+                            materials:
+                                scannedMaterials, // Pasar materiales escaneados
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF104B28),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 12.0),
+                    ),
+                    child: const Text(
+                      'Agregar al contenedor',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                ),
+              ],
             ),
     );
   }
