@@ -538,7 +538,6 @@ class AuthService {
         }),
       );
 
-      // Imprime el cuerpo de la respuesta para depuración
       print('Respuesta de la API: ${response.body}');
 
       if (response.statusCode == 200) {
@@ -554,6 +553,8 @@ class AuthService {
               'date': item['date'],
               'hour': item['hour'],
               'scheduled_date': item['scheduled_date'],
+              'latitude': item['latitude'], // Agregado
+              'longitude': item['longitude'], // Agregado
             };
           }).toList();
         } else {

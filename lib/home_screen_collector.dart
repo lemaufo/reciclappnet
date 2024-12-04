@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:reciclapp/auth_service.dart';
 import 'package:reciclapp/custom_bottom_nav_bar_collector.dart';
+import 'package:reciclapp/view_map_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreenCollector extends StatefulWidget {
@@ -217,6 +218,11 @@ class _HomeScreenCollectorState extends State<HomeScreenCollector> {
                               itemCount: requests.length,
                               itemBuilder: (context, index) {
                                 final request = requests[index];
+                                final latitude =
+                                    double.tryParse(request['latitude']) ?? 0.0;
+                                final longitude =
+                                    double.tryParse(request['longitude']) ??
+                                        0.0;
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 15),
                                   padding: const EdgeInsets.all(16.0),
@@ -262,9 +268,16 @@ class _HomeScreenCollectorState extends State<HomeScreenCollector> {
                                               color: Color(0xFF104B28),
                                             ),
                                             onPressed: () {
-                                              // Acción para el icono del mapa
-                                              print(
-                                                  'Mapa presionado para: ${request['code']}');
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MapViewScreen(
+                                                    latitude: latitude,
+                                                    longitude: longitude,
+                                                  ),
+                                                ),
+                                              );
                                             },
                                           ),
                                           Row(

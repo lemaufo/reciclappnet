@@ -23,7 +23,7 @@ class CustomBottomNavBarCollector extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, '/learncollector');
                 break;
               case 2:
-                Navigator.pushReplacementNamed(context, '/requests');
+                Navigator.pushReplacementNamed(context, '/requestscollector');
                 break;
               case 3:
                 Navigator.pushReplacementNamed(context, '/profilecollector');

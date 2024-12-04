@@ -14,6 +14,7 @@ import 'package:reciclapp/privacy_terms_collector_screen.dart';
 import 'package:reciclapp/privacy_terms_screen.dart';
 import 'package:reciclapp/privacy_and_terms_screen.dart';
 import 'package:reciclapp/profile_screen_collector.dart';
+import 'package:reciclapp/requests_collector_screen.dart';
 // import 'package:reciclapp/requests_collector_screen.dart';
 import 'package:reciclapp/requestscreen.dart';
 import 'package:reciclapp/reset_password_screen.dart';
@@ -133,6 +134,7 @@ class ReciclApp extends StatelessWidget {
             const NotificationsCollectorScreen(),
         '/emailresetpassword': (context) => PasswordRecoveryScreen(),
         '/request': (context) => const RequestScreen(),
+        '/requestscollector': (context) => const RequestsCollectorScreen(),
         '/container': (context) => const ContainerScreen(
               materials: [],
             ),
