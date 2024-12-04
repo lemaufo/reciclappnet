@@ -527,6 +527,80 @@ class AuthService {
     }
   }
 
+  // Método para mostrar todas las solicitudes
+  Future<List<Map<String, dynamic>>> fetchAllRequests() async {
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "action": "get_all_requests",
+        }),
+      );
+
+      // Imprime el cuerpo de la respuesta para depuración
+      print('Respuesta de la API: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+
+        if (responseData['success'] == true) {
+          List<dynamic> data = responseData['requests'];
+          return data.map((item) {
+            return {
+              'code': item['code'],
+              'user_id': item['user_id'],
+              'status': item['status'],
+              'date': item['date'],
+              'hour': item['hour'],
+              'scheduled_date': item['scheduled_date'],
+            };
+          }).toList();
+        } else {
+          throw Exception(
+              'Error en la respuesta de la API: ${responseData['message'] ?? 'Sin mensaje de error'}');
+        }
+      } else {
+        throw Exception('Error en la solicitud HTTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Excepción al obtener todas las solicitudes: $e');
+      throw Exception('Error al cargar todas las solicitudes');
+    }
+  }
+
+  // Método para actualizar el estado de una solicitud
+  Future<bool> updateRequestStatus(String code, String status) async {
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "action": "update_request_status",
+          "code": code,
+          "status": status,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        if (responseData['success'] == true) {
+          return true;
+        } else {
+          throw Exception(
+              'Error al actualizar estado: ${responseData['message']}');
+        }
+      } else {
+        throw Exception('Error HTTP: ${response.statusCode}');
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Excepción al actualizar estado: $e');
+      return false;
+    }
+  }
+
   // Método para cerrar sesión
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
